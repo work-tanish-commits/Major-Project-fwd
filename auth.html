@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Authentication | Blood Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Global Header -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">Blood<span>Bridge</span></div>
+          <div class="brand-tagline">Healthcare Inventory &amp; Donor Network</div>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="patient-search.html" class="nav-item">Find Blood Availability</a>
+        <a href="hospital-dashboard.html" class="nav-item">Hospital Portal</a>
+      </nav>
+
+      <div class="nav-auth-group">
+        <a href="index.html" class="btn btn-outline btn-sm">&larr; Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- AUTH MAIN CONTAINER -->
+  <main class="auth-wrapper">
+    <div class="container">
+      
+      <!-- Already logged in notice if session active -->
+      <div id="alreadyLoggedInBanner" class="hidden" style="max-width: 680px; margin: 0 auto 24px auto; background: #e0f2fe; border: 1.5px solid #0284c7; padding: 18px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <strong style="color: #0369a1; font-size: 1.05rem;" id="activeUserNotice">Active Session Detected</strong>
+          <p style="font-size: 0.9rem; color: #075985; margin-top: 2px;" id="activeUserSub">You are currently logged in.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="#" id="btnGoToDashboard" class="btn btn-sm btn-teal">Go to Dashboard</a>
+          <button id="btnSwitchAccount" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <!-- Auth Header -->
+        <div class="auth-header">
+          <h1 id="authMainTitle">Blood Bridge Portal Access</h1>
+          <p id="authSubtitle">Select your role to login or create a registered account</p>
+        </div>
+
+        <!-- Role Switching Tabs (Hospital vs Patient) -->
+        <div class="auth-role-tabs">
+          <button type="button" class="auth-role-btn active" id="tabPatientRole" onclick="switchRole('patient')">
+            <span style="font-size: 1.2rem;">&#10084;</span> Patient / Individual
+          </button>
+          <button type="button" class="auth-role-btn hospital-tab" id="tabHospitalRole" onclick="switchRole('hospital')">
+            <span style="font-size: 1.2rem;">&#127973;</span> Hospital / Blood Bank
+          </button>
+        </div>
+
+        <!-- Action Switcher: Login vs Register -->
+        <div class="auth-action-switch">
+          <button type="button" class="action-pill active" id="pillLogin" onclick="switchAction('login')">Sign In</button>
+          <button type="button" class="action-pill" id="pillRegister" onclick="switchAction('register')">Create New Account</button>
+        </div>
+
+        <div class="auth-body">
+
+          <!-- Notice when redirected because login is required for requesting blood -->
+          <div id="loginRequiredNotice" class="hidden" style="margin-bottom: 20px; background: #fef2f2; border: 1.5px solid #f87171; border-radius: 8px; padding: 12px 16px; color: #991b1b; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.25rem;">&#9888;</span>
+            <span>Sign In Required: Please sign in or register as a patient to submit your blood request ticket.</span>
+          </div>
+
+          <!-- 1. PATIENT FORMS -->
+          <div id="patientFormsContainer">
+            <!-- Patient Login Form -->
+            <form id="patientLoginForm" class="styled-auth-form">
+              <div class="form-group">
+                <label for="pLoginEmail">Email Address <span class="required">*</span></label>
+                <input type="email" id="pLoginEmail" class="form-control" required placeholder="name@example.com">
+              </div>
+              <div class="form-group">
+                <label for="pLoginPassword">Password <span class="required">*</span></label>
+                <input type="password" id="pLoginPassword" class="form-control" required placeholder="Enter password">
+              </div>
+              <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+                Sign In as Patient &rarr;
+              </button>
+            </form>
+
+            <!-- Patient Register Form -->
+            <form id="patientRegisterForm" class="styled-auth-form hidden">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="pRegName">Full Name <span class="required">*</span></label>
+                  <input type="text" id="pRegName" class="form-control" required placeholder="e.g. Rahul Sharma">
+                </div>
+                <div class="form-group">
+                  <label for="pRegPhone">Phone Number <span class="required">*</span></label>
+                  <input type="tel" id="pRegPhone" class="form-control" required placeholder="e.g. +91-98765-43210">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="pRegBloodGroup">Blood Group <span class="required">*</span></label>
+                  <select id="pRegBloodGroup" class="form-control" required>
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O- (Universal Donor)</option>
+                    <option value="AB+">AB+ (Universal Recipient)</option>
+                    <option value="AB-">AB-</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="pRegCity">City / Area <span class="required">*</span></label>
+                  <input type="text" id="pRegCity" class="form-control" required placeholder="e.g. South Delhi, Noida, Gurugram">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="pRegEmail">Email Address <span class="required">*</span></label>
+                  <input type="email" id="pRegEmail" class="form-control" required placeholder="rahul@example.com">
+                </div>
+                <div class="form-group">
+                  <label for="pRegPassword">Create Password <span class="required">*</span></label>
+                  <input type="password" id="pRegPassword" class="form-control" required minlength="6" placeholder="Min 6 characters">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+                Complete Patient Registration &rarr;
+              </button>
+            </form>
+          </div>
+
+          <!-- 2. HOSPITAL FORMS -->
+          <div id="hospitalFormsContainer" class="hidden">
+            <!-- Hospital Login Form -->
+            <form id="hospitalLoginForm" class="styled-auth-form">
+              <div class="form-group">
+                <label for="hLoginEmail">Official Hospital Email <span class="required">*</span></label>
+                <input type="email" id="hLoginEmail" class="form-control" required placeholder="bloodbank@aiims.edu">
+              </div>
+              <div class="form-group">
+                <label for="hLoginPassword">Password <span class="required">*</span></label>
+                <input type="password" id="hLoginPassword" class="form-control" required placeholder="Enter password">
+              </div>
+              <button type="submit" class="btn btn-teal btn-block btn-lg" style="margin-top: 10px;">
+                Sign In to Hospital Portal &rarr;
+              </button>
+            </form>
+
+            <!-- Hospital Register Form -->
+            <form id="hospitalRegisterForm" class="styled-auth-form hidden">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hRegName">Hospital / Blood Bank Name <span class="required">*</span></label>
+                  <input type="text" id="hRegName" class="form-control" required placeholder="e.g. AIIMS Blood Bank">
+                </div>
+                <div class="form-group">
+                  <label for="hRegLicense">License / Registration ID <span class="required">*</span></label>
+                  <input type="text" id="hRegLicense" class="form-control" required placeholder="e.g. LIC-DL-2024-101">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hRegCity">City / Area <span class="required">*</span></label>
+                  <input type="text" id="hRegCity" class="form-control" required placeholder="e.g. South Delhi, Noida, Gurugram">
+                </div>
+                <div class="form-group">
+                  <label for="hRegPhone">Emergency Blood Bank Contact <span class="required">*</span></label>
+                  <input type="tel" id="hRegPhone" class="form-control" required placeholder="e.g. +91-98234-56789">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="hRegAddress">Full Address &amp; Location <span class="required">*</span></label>
+                <input type="text" id="hRegAddress" class="form-control" required placeholder="e.g. Sri Aurobindo Marg, Ansari Nagar, New Delhi - 110029">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hRegEmail">Official Contact Email <span class="required">*</span></label>
+                  <input type="email" id="hRegEmail" class="form-control" required placeholder="bloodbank@hospital.org">
+                </div>
+                <div class="form-group">
+                  <label for="hRegPassword">Create Password <span class="required">*</span></label>
+                  <input type="password" id="hRegPassword" class="form-control" required minlength="6" placeholder="Min 6 characters">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-teal btn-block btn-lg" style="margin-top: 10px;">
+                Register Hospital &amp; Access Dashboard &rarr;
+              </button>
+            </form>
+          </div>
+
+          <!-- 1-Click Demo Accounts Box for Rapid Evaluation -->
+          <div class="demo-accounts-card">
+            <div class="demo-title">&#9889; 1-Click Pre-Filled Demo Accounts</div>
+            <div class="demo-buttons-row">
+              <button type="button" class="btn btn-xs btn-outline-teal" onclick="fillDemo('hospital')">
+                Fill Demo Hospital (AIIMS Blood Bank)
+              </button>
+              <button type="button" class="btn btn-xs btn-outline-red" onclick="fillDemo('patient')">
+                Fill Demo Patient (Rahul Sharma)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="storage.js"></script>
+  <script>
+    let currentRole = 'patient'; // 'patient' or 'hospital'
+    let currentAction = 'login'; // 'login' or 'register'
+
+    function switchRole(role) {
+      currentRole = role;
+      const tabPatient = document.getElementById('tabPatientRole');
+      const tabHospital = document.getElementById('tabHospitalRole');
+      const patientContainer = document.getElementById('patientFormsContainer');
+      const hospitalContainer = document.getElementById('hospitalFormsContainer');
+
+      if (role === 'hospital') {
+        tabHospital.classList.add('active');
+        tabPatient.classList.remove('active');
+        hospitalContainer.classList.remove('hidden');
+        patientContainer.classList.add('hidden');
+      } else {
+        tabPatient.classList.add('active');
+        tabHospital.classList.remove('active');
+        patientContainer.classList.remove('hidden');
+        hospitalContainer.classList.add('hidden');
+      }
+      updateFormVisibility();
+    }
+
+    function switchAction(action) {
+      currentAction = action;
+      const pillLogin = document.getElementById('pillLogin');
+      const pillRegister = document.getElementById('pillRegister');
+
+      if (action === 'register') {
+        pillRegister.classList.add('active');
+        pillLogin.classList.remove('active');
+      } else {
+        pillLogin.classList.add('active');
+        pillRegister.classList.remove('active');
+      }
+      updateFormVisibility();
+    }
+
+    function updateFormVisibility() {
+      // Patient forms
+      document.getElementById('patientLoginForm').classList.toggle('hidden', currentRole !== 'patient' || currentAction !== 'login');
+      document.getElementById('patientRegisterForm').classList.toggle('hidden', currentRole !== 'patient' || currentAction !== 'register');
+
+      // Hospital forms
+      document.getElementById('hospitalLoginForm').classList.toggle('hidden', currentRole !== 'hospital' || currentAction !== 'login');
+      document.getElementById('hospitalRegisterForm').classList.toggle('hidden', currentRole !== 'hospital' || currentAction !== 'register');
+    }
+
+    function fillDemo(type) {
+      if (type === 'hospital') {
+        switchRole('hospital');
+        switchAction('login');
+        document.getElementById('hLoginEmail').value = 'bloodbank@aiims.edu';
+        document.getElementById('hLoginPassword').value = 'hospital123';
+        StorageDB.showToast('Pre-filled credentials for AIIMS Blood Bank (Delhi).', 'info');
+      } else {
+        switchRole('patient');
+        switchAction('login');
+        document.getElementById('pLoginEmail').value = 'rahul.sharma@gmail.com';
+        document.getElementById('pLoginPassword').value = 'patient123';
+        StorageDB.showToast('Pre-filled credentials for Patient Rahul Sharma.', 'info');
+      }
+    }
+
+    function getPatientRedirectUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnUrl = urlParams.get('returnUrl');
+      if (!returnUrl) return 'patient-search.html';
+
+      let dest = returnUrl;
+      const extra = [];
+      const hospId = urlParams.get('hospId');
+      const group = urlParams.get('group');
+      const comp = urlParams.get('comp');
+
+      if (hospId) extra.push(`hospId=${encodeURIComponent(hospId)}`);
+      if (group) extra.push(`group=${encodeURIComponent(group)}`);
+      if (comp) extra.push(`comp=${encodeURIComponent(comp)}`);
+
+      if (extra.length > 0) {
+        dest += (dest.includes('?') ? '&' : '?') + extra.join('&');
+      }
+      return dest;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check URL parameters for pre-selected role (e.g. auth.html?role=hospital)
+      const urlParams = new URLSearchParams(window.location.search);
+      const roleParam = urlParams.get('role');
+      if (roleParam === 'hospital' || roleParam === 'patient') {
+        switchRole(roleParam);
+      }
+      const actionParam = urlParams.get('action');
+      if (actionParam === 'register') {
+        switchAction('register');
+      }
+
+      // Check if redirected because login is required to request blood
+      if (urlParams.get('msg') === 'login_required') {
+        const noticeEl = document.getElementById('loginRequiredNotice');
+        if (noticeEl) noticeEl.classList.remove('hidden');
+        StorageDB.showToast('Please sign in or register as a patient to submit your blood request.', 'warning', 4500);
+      }
+
+      // Check if user is already logged in
+      const currentUser = StorageDB.getCurrentUser();
+      if (currentUser) {
+        const banner = document.getElementById('alreadyLoggedInBanner');
+        const notice = document.getElementById('activeUserNotice');
+        const sub = document.getElementById('activeUserSub');
+        const btnDash = document.getElementById('btnGoToDashboard');
+
+        banner.classList.remove('hidden');
+        notice.textContent = `Logged in as: ${currentUser.name} (${currentUser.role === 'hospital' ? 'Hospital' : 'Patient'})`;
+        sub.textContent = `Email: ${currentUser.email}`;
+        btnDash.href = currentUser.role === 'hospital' ? 'hospital-dashboard.html' : getPatientRedirectUrl();
+
+        document.getElementById('btnSwitchAccount').addEventListener('click', () => {
+          StorageDB.logout();
+        });
+      }
+
+      // Bind Patient Login
+      document.getElementById('patientLoginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('pLoginEmail').value.trim();
+        const password = document.getElementById('pLoginPassword').value.trim();
+
+        const patient = StorageDB.getPatientByEmail(email);
+        if (!patient || patient.password !== password) {
+          StorageDB.showToast('Invalid email or password for patient account.', 'danger');
+          return;
+        }
+
+        StorageDB.setCurrentUser(patient);
+        const destination = getPatientRedirectUrl();
+        StorageDB.showToast(`Welcome back, ${patient.name}! Redirecting to blood availability search...`, 'success');
+        setTimeout(() => {
+          window.location.href = destination;
+        }, 500);
+      });
+
+      // Bind Patient Register
+      document.getElementById('patientRegisterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('pRegName').value.trim();
+        const phone = document.getElementById('pRegPhone').value.trim();
+        const bloodGroup = document.getElementById('pRegBloodGroup').value;
+        const city = document.getElementById('pRegCity').value.trim();
+        const email = document.getElementById('pRegEmail').value.trim();
+        const password = document.getElementById('pRegPassword').value.trim();
+
+        if (StorageDB.getPatientByEmail(email)) {
+          StorageDB.showToast('A patient account with this email already exists.', 'warning');
+          return;
+        }
+
+        const newPatient = {
+          id: 'pat_' + Date.now(),
+          name,
+          phone,
+          bloodGroup,
+          city,
+          email,
+          password,
+          role: 'patient',
+          createdAt: new Date().toISOString()
+        };
+
+        StorageDB.savePatient(newPatient);
+        StorageDB.setCurrentUser(newPatient);
+        const destination = getPatientRedirectUrl();
+        StorageDB.showToast('Account registered successfully! Welcome to Blood Bridge.', 'success');
+        setTimeout(() => {
+          window.location.href = destination;
+        }, 500);
+      });
+
+      // Bind Hospital Login
+      document.getElementById('hospitalLoginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('hLoginEmail').value.trim();
+        const password = document.getElementById('hLoginPassword').value.trim();
+
+        const hospital = StorageDB.getHospitalByEmail(email);
+        if (!hospital || hospital.password !== password) {
+          StorageDB.showToast('Invalid credentials for hospital portal. Check email or password.', 'danger');
+          return;
+        }
+
+        StorageDB.setCurrentUser(hospital);
+        StorageDB.showToast(`Logged in to ${hospital.name}. Redirecting to inventory dashboard...`, 'success');
+        setTimeout(() => {
+          window.location.href = 'hospital-dashboard.html';
+        }, 600);
+      });
+
+      // Bind Hospital Register
+      document.getElementById('hospitalRegisterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('hRegName').value.trim();
+        const licenseId = document.getElementById('hRegLicense').value.trim();
+        const city = document.getElementById('hRegCity').value.trim();
+        const phone = document.getElementById('hRegPhone').value.trim();
+        const address = document.getElementById('hRegAddress').value.trim();
+        const email = document.getElementById('hRegEmail').value.trim();
+        const password = document.getElementById('hRegPassword').value.trim();
+
+        if (StorageDB.getHospitalByEmail(email)) {
+          StorageDB.showToast('A hospital with this official email address already exists.', 'warning');
+          return;
+        }
+
+        // Initialize empty inventory for new hospital
+        const initialInventory = {};
+        BLOOD_COMPONENTS.forEach(comp => {
+          initialInventory[comp] = {};
+          BLOOD_GROUPS.forEach(grp => {
+            initialInventory[comp][grp] = 0;
+          });
+        });
+
+        const newHospital = {
+          id: 'hosp_' + Date.now(),
+          name,
+          licenseId,
+          city,
+          address,
+          phone,
+          email,
+          password,
+          role: 'hospital',
+          lastUpdated: new Date().toISOString(),
+          inventory: initialInventory
+        };
+
+        StorageDB.saveHospital(newHospital);
+        StorageDB.setCurrentUser(newHospital);
+        StorageDB.showToast(`Hospital "${name}" registered! Opening your inventory dashboard...`, 'success');
+        setTimeout(() => {
+          window.location.href = 'hospital-dashboard.html';
+        }, 600);
+      });
+    });
+  </script>
+</body>
+</html>

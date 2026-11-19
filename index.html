@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Bridge | Real-Time Blood Connection & Inventory Network</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Emergency Helpline Banner -->
+  <aside class="emergency-banner" role="alert">
+    <div class="container emergency-banner-content">
+      <div class="emergency-info">
+        <span class="pulse-indicator"></span>
+        <span><strong>24/7 National Emergency Blood Helpline:</strong> Call <a href="tel:1800256632" class="helpline-link">1800-BLOOD-BRIDGE (1800-256-632)</a></span>
+      </div>
+      <div class="emergency-actions">
+        <a href="patient-search.html?emergency=true" class="btn btn-xs btn-primary">Find Emergency Stock</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Global Navigation Header -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">Blood<span>Bridge</span></div>
+          <div class="brand-tagline">Healthcare Inventory &amp; Donor Network</div>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item active">Home</a>
+        <a href="patient-search.html" class="nav-item">Find Blood Availability</a>
+        <a href="hospital-dashboard.html" class="nav-item">Hospital Portal</a>
+      </nav>
+
+      <div class="nav-auth-group" id="navAuthContainer">
+        <!-- Injected via JavaScript based on currentUser in localStorage -->
+        <a href="auth.html" class="btn btn-outline btn-sm">Sign In / Register</a>
+        <a href="patient-search.html" class="btn btn-primary btn-sm">Search Stock</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LANDING PAGE CONTENT -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <div class="hero-text-content">
+          <div class="hero-badge-tag">
+            <span>&#9888;</span> Real-Time Hospital Stock &bull; Zero Delay
+          </div>
+          <h1 class="hero-title">
+            Every Second Matters.<br>
+            Bridging <span>Blood Units</span> Directly to Patients.
+          </h1>
+          <p class="hero-description">
+            Blood Bridge links registered hospitals, blood banks, and patients on a synchronized real-time inventory network. Check available blood components, reserve life-saving units, or manage clinical hospital stock with instant digital transparency.
+          </p>
+
+          <div class="hero-actions-row">
+            <a href="patient-search.html" class="btn btn-primary btn-lg">
+              <span>&#128269;</span> Check Nearby Blood Availability
+            </a>
+            <a href="auth.html?role=hospital" class="btn btn-teal btn-lg">
+              <span>&#127973;</span> Hospital Inventory Login
+            </a>
+          </div>
+        </div>
+
+        <!-- Role Selection Cards on Hero Right -->
+        <div class="role-cards-container">
+          <!-- Hospital Role Card -->
+          <div class="role-card hospital-role">
+            <div class="role-card-icon">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/>
+              </svg>
+            </div>
+            <div class="role-card-content">
+              <h3>For Hospitals &amp; Blood Banks</h3>
+              <p>Manage real-time component stock for Whole Blood, Plasma, RBC, and WBC. Review and approve incoming urgent patient requests.</p>
+              <a href="auth.html?role=hospital" class="btn btn-teal btn-block">
+                Login / Register as Hospital &rarr;
+              </a>
+            </div>
+          </div>
+
+          <!-- Patient Role Card -->
+          <div class="role-card patient-role">
+            <div class="role-card-icon">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+            <div class="role-card-content">
+              <h3>For Patients &amp; Attendants</h3>
+              <p>Locate tested blood units in your city, check blood group compatibility, get hospital directions, and submit urgent reserve tickets.</p>
+              <a href="auth.html?role=patient" class="btn btn-primary btn-block">
+                Login / Register as Patient &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Network Summary Counters (Dynamically Pulled from localStorage) -->
+    <section class="network-stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number" id="counterHospitals">0</div>
+            <div class="stat-label">Registered Hospitals</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="counterUnits">0</div>
+            <div class="stat-label">Total Units Available</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="counterCities">0</div>
+            <div class="stat-label">Cities / Districts Covered</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="counterFulfilled">0</div>
+            <div class="stat-label">Urgent Requests Fulfilled</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section style="padding: 60px 0; background-color: var(--bg-slate);">
+      <div class="container">
+        <div style="text-align: center; max-width: 700px; margin: 0 auto 40px auto;">
+          <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 10px;">How Blood Bridge Works</h2>
+          <p style="color: var(--text-muted);">A closed-loop synchronization between hospitals managing supplies and families searching for emergency units.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+          <div style="background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-slate);">
+            <div style="font-size: 1.5rem; color: var(--hospital-blue); margin-bottom: 12px; font-weight: 800;">01</div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Hospital Stock Update</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Blood bank officers update stock levels for Whole Blood, RBC, Plasma, and WBC with one-click increment controls.</p>
+          </div>
+
+          <div style="background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-slate);">
+            <div style="font-size: 1.5rem; color: var(--primary-red); margin-bottom: 12px; font-weight: 800;">02</div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Real-Time Patient Search</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Patients instantly filter nearby hospitals by area, required component, and blood group with live color-coded status badges.</p>
+          </div>
+
+          <div style="background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-slate);">
+            <div style="font-size: 1.5rem; color: #15803d; margin-bottom: 12px; font-weight: 800;">03</div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Direct Unit Reservation</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Patients submit urgent request tickets. Hospitals approve requests with automatic inventory deduction.</p>
+          </div>
+
+          <div style="background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-slate);">
+            <div style="font-size: 1.5rem; color: #7c3aed; margin-bottom: 12px; font-weight: 800;">04</div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Compatibility Check</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Interactive biological compatibility checker guides patients on universal donors and compatible crossmatch types.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#dc2626">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+          Blood<span>Bridge</span>
+        </div>
+        <div>
+          <p style="font-size: 0.85rem; color: #94a3b8;">Pure HTML5, CSS3 &amp; Vanilla JavaScript frontend with real-time localStorage database sync.</p>
+        </div>
+        <div>
+          <a href="auth.html?role=hospital" style="color: #38bdf8; text-decoration: none; font-size: 0.85rem; margin-right: 14px;">Hospital Portal</a>
+          <a href="patient-search.html" style="color: #f87171; text-decoration: none; font-size: 0.85rem;">Find Blood</a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2026 Blood Bridge System. Pre-populated with realistic simulation hospitals.
+      </div>
+    </div>
+  </footer>
+
+  <script src="storage.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Pull dynamic network statistics from localStorage
+      const stats = StorageDB.getNetworkStats();
+      const elHosp = document.getElementById('counterHospitals');
+      const elUnits = document.getElementById('counterUnits');
+      const elCities = document.getElementById('counterCities');
+      const elFulfilled = document.getElementById('counterFulfilled');
+
+      if (elHosp) elHosp.textContent = stats.totalHospitals;
+      if (elUnits) elUnits.textContent = stats.totalUnits;
+      if (elCities) elCities.textContent = stats.citiesCount;
+      if (elFulfilled) elFulfilled.textContent = stats.fulfilledRequests;
+
+      // Update navbar with user status if logged in
+      const currentUser = StorageDB.getCurrentUser();
+      const authContainer = document.getElementById('navAuthContainer');
+      if (currentUser && authContainer) {
+        const isHospital = currentUser.role === 'hospital';
+        authContainer.innerHTML = `
+          <div class="user-profile-pill">
+            <span class="user-role-badge ${isHospital ? 'hospital-badge' : ''}">${isHospital ? 'Hospital' : 'Patient'}</span>
+            <span class="user-display-name">${StorageDB.escapeHtml(currentUser.name)}</span>
+          </div>
+          <a href="${isHospital ? 'hospital-dashboard.html' : 'patient-search.html'}" class="btn btn-sm ${isHospital ? 'btn-teal' : 'btn-primary'}">
+            Dashboard
+          </a>
+          <button class="btn btn-sm btn-outline" id="navLogoutBtn">Logout</button>
+        `;
+
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+          StorageDB.logout();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

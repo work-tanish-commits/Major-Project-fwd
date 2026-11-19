@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nearby Blood Availability &amp; Request Portal | Blood Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Emergency Line Banner -->
+  <aside class="emergency-banner" role="alert">
+    <div class="container emergency-banner-content">
+      <div class="emergency-info">
+        <span class="pulse-indicator"></span>
+        <span><strong>Emergency Blood Locator:</strong> 24/7 Verified Hospital &amp; Blood Bank Real-Time Inventory.</span>
+      </div>
+      <div>
+        <a href="tel:1800256632" class="helpline-link">Call Emergency Dispatch: 1800-256-632</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">Blood<span>Bridge</span></div>
+          <div class="brand-tagline">Healthcare Inventory &amp; Donor Network</div>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-item">Home</a>
+        <a href="patient-search.html" class="nav-item active">Find Blood Availability</a>
+        <a href="hospital-dashboard.html" class="nav-item">Hospital Portal</a>
+      </nav>
+
+      <div class="nav-auth-group" id="patientNavAuth">
+        <!-- Injected via JavaScript -->
+        <a href="auth.html?role=patient" class="btn btn-outline btn-sm">Patient Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portal Header -->
+  <section class="patient-portal-header">
+    <div class="container">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 9999px;">
+            Live Hospital Network
+          </span>
+          <h1 style="font-size: 2.2rem; font-weight: 900; margin-top: 8px;">
+            Search Nearby Blood Availability
+          </h1>
+          <p style="color: #fecdd3; font-size: 1.05rem; margin-top: 4px;">
+            Instant real-time stock lookup across registered hospitals. Reserve units or contact facilities directly.
+          </p>
+        </div>
+        <div>
+          <button id="btnOpenMyRequests" class="btn btn-outline-white btn-sm">
+            <span>&#128203;</span> My Submitted Requests (<span id="myRequestsBadgeCount">0</span>)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN SEARCH & COMPATIBILITY CONTENT -->
+  <main class="container">
+
+    <!-- Search & Filter Bar -->
+    <div class="search-filter-card">
+      <form id="searchFilterForm">
+        <div class="filter-grid">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterCity">Select City / Area</label>
+            <select id="filterCity" class="form-control">
+              <option value="ALL">All Cities &amp; Regions</option>
+              <!-- Populated dynamically from registered hospitals -->
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterComponent">Component</label>
+            <select id="filterComponent" class="form-control">
+              <option value="Whole Blood">Whole Blood</option>
+              <option value="Plasma">Plasma (FFP)</option>
+              <option value="RBC">Red Blood Cells (RBC)</option>
+              <option value="WBC">White Blood Cells (WBC)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="filterBloodGroup">Target Blood Group</label>
+            <select id="filterBloodGroup" class="form-control">
+              <option value="ALL">All Blood Groups</option>
+              <option value="O+">O+</option>
+              <option value="O-">O- (Universal)</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0; min-width: 140px;">
+            <label>&nbsp;</label>
+            <button type="button" id="btnResetFilters" class="btn btn-outline btn-block">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Layout: Left Results Column + Right Compatibility Sidebar -->
+    <div class="patient-main-layout">
+
+      <!-- LEFT: Hospital Result Cards Column -->
+      <section>
+        <div class="results-heading-row">
+          <div>
+            <h2 id="resultsHeading">Available Hospital Stock (5 Facilities)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);" id="resultsSubheading">
+              Showing verified clinical inventory updated in real-time by hospital blood banks.
+            </p>
+          </div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 9999px;">
+            &#10003; Live Synchronized
+          </span>
+        </div>
+
+        <div class="hospital-results-list" id="hospitalResultsList">
+          <!-- Rendered dynamically via patient.js -->
+        </div>
+      </section>
+
+      <!-- RIGHT: Interactive Blood Compatibility Checker Widget -->
+      <aside>
+        <div class="compatibility-widget">
+          <div class="compat-header">
+            <h3>
+              <span>&#129656;</span> Compatibility Checker
+            </h3>
+            <p>Select the patient's blood type to visualize safe compatible donor and recipient groups.</p>
+          </div>
+
+          <div class="compat-select-box">
+            <label for="compatBloodGroupSelect" style="font-size: 0.85rem; margin-bottom: 6px; display: block;">Patient's Blood Group:</label>
+            <select id="compatBloodGroupSelect" class="form-control">
+              <option value="A+">A+ (A Positive)</option>
+              <option value="A-">A- (A Negative)</option>
+              <option value="B+">B+ (B Positive)</option>
+              <option value="B-">B- (B Negative)</option>
+              <option value="O+" selected>O+ (O Positive)</option>
+              <option value="O-">O- (Universal Donor)</option>
+              <option value="AB+">AB+ (Universal Recipient)</option>
+              <option value="AB-">AB- (AB Negative)</option>
+            </select>
+          </div>
+
+          <div class="compat-results-box" id="compatResultsContainer">
+            <!-- Rendered dynamically via patient.js -->
+          </div>
+
+          <div style="margin-top: 16px; font-size: 0.775rem; color: var(--text-muted); line-height: 1.45; border-top: 1px solid var(--border-slate); padding-top: 12px;">
+            <strong>Clinical Safety Protocol:</strong> In extreme emergencies, <strong>O- Negative</strong> Red Blood Cells can be administered to patients of any blood group pending laboratory crossmatching.
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- 1. REQUEST / RESERVE UNITS MODAL -->
+  <div class="modal-backdrop hidden" id="requestReserveModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Submit Urgent Blood Request Ticket</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">This ticket appears immediately in the target hospital's command dashboard.</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('requestReserveModal')">&times;</button>
+      </div>
+
+      <form id="reserveUnitsForm">
+        <div class="modal-body">
+          <input type="hidden" id="modalTargetHospId">
+
+          <div class="form-group">
+            <label>Selected Healthcare Facility</label>
+            <input type="text" id="modalTargetHospName" class="form-control" readonly style="background-color: var(--bg-slate); font-weight: 700;">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modalPatientName">Patient Full Name <span class="required">*</span></label>
+              <input type="text" id="modalPatientName" class="form-control" required placeholder="e.g. Rahul Sharma">
+            </div>
+            <div class="form-group">
+              <label for="modalPatientPhone">Attendant Contact Mobile <span class="required">*</span></label>
+              <input type="tel" id="modalPatientPhone" class="form-control" required placeholder="e.g. +91-98765-43210">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modalBloodGroup">Required Blood Group <span class="required">*</span></label>
+              <select id="modalBloodGroup" class="form-control" required>
+                <option value="O+">O+</option>
+                <option value="O-">O- (Universal)</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="modalComponent">Component <span class="required">*</span></label>
+              <select id="modalComponent" class="form-control" required>
+                <option value="Whole Blood">Whole Blood</option>
+                <option value="Plasma">Plasma (FFP)</option>
+                <option value="RBC">Red Blood Cells (RBC)</option>
+                <option value="WBC">White Blood Cells (WBC)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modalUnits">Units (Bags) Needed <span class="required">*</span></label>
+              <input type="number" id="modalUnits" class="form-control" min="1" max="10" value="1" required>
+            </div>
+            <div class="form-group">
+              <label for="modalUrgency">Urgency Classification <span class="required">*</span></label>
+              <select id="modalUrgency" class="form-control" required>
+                <option value="Critical Emergency">Critical Emergency (Immediate need)</option>
+                <option value="Urgent">Urgent (Within 6-12 Hours)</option>
+                <option value="Standard">Standard (Within 24-48 Hours)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="modalNotes">Clinical Notes / IPD Room / Doctor Reference (Optional)</label>
+            <textarea id="modalNotes" class="form-control" rows="2" placeholder="e.g. Scheduled for cardiac bypass at 8 AM. Need 2 units for standby."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('requestReserveModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Transmit Request Ticket &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MY SUBMITTED REQUESTS MODAL -->
+  <div class="modal-backdrop hidden" id="myRequestsModal">
+    <div class="modal-dialog" style="max-width: 720px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">My Submitted Blood Requests</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time tracking of requests submitted from this browser or patient account.</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('myRequestsModal')">&times;</button>
+      </div>
+
+      <div class="modal-body" id="myRequestsModalBody">
+        <!-- Rendered via patient.js -->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('myRequestsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Footer -->
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#dc2626">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+          Blood<span>Bridge</span>
+        </div>
+        <div>
+          <a href="index.html" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; margin-right: 14px;">Home</a>
+          <a href="auth.html?role=hospital" style="color: #38bdf8; text-decoration: none; font-size: 0.85rem;">Hospital Portal</a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2026 Blood Bridge System.
+      </div>
+    </div>
+  </footer>
+
+  <script src="storage.js"></script>
+  <script src="patient.js"></script>
+</body>
+</html>
